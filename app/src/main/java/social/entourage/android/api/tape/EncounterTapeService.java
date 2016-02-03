@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
 
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
@@ -16,7 +17,6 @@ import social.entourage.android.EntourageApplication;
 import social.entourage.android.api.tape.event.ConnectionChangedEvent;
 import social.entourage.android.map.encounter.CreateEncounterPresenter.EncounterUploadCallback;
 import social.entourage.android.map.encounter.CreateEncounterPresenter.EncounterUploadTask;
-import social.entourage.android.tools.BusProvider;
 
 public class EncounterTapeService extends Service implements EncounterUploadCallback {
 
@@ -24,8 +24,8 @@ public class EncounterTapeService extends Service implements EncounterUploadCall
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    EncounterTapeTaskQueue queue;
+    @Inject EncounterTapeTaskQueue queue;
+    @Inject Bus bus;
     private static boolean running;
     private boolean connected;
 
@@ -36,9 +36,9 @@ public class EncounterTapeService extends Service implements EncounterUploadCall
     @Override
     public void onCreate() {
         super.onCreate();
-        EntourageApplication.get(this).getEntourageComponent().inject(this);
+        EntourageApplication.application().getComponent().inject(this);
         connected = isConnected();
-        BusProvider.getInstance().register(this);
+        bus.register(this);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class EncounterTapeService extends Service implements EncounterUploadCall
     }
 
     private void stopService() {
-        BusProvider.getInstance().unregister(this);
+        bus.unregister(this);
         stopSelf();
     }
 
@@ -115,17 +115,19 @@ public class EncounterTapeService extends Service implements EncounterUploadCall
 
     public static class ConnectionChangeReceiver extends BroadcastReceiver {
 
+        @Inject Bus bus;
+
         @Override
         public void onReceive(Context context, Intent intent) {
-            BusProvider.getInstance().register(this);
+            bus.register(this);
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
             if (activeNetInfo != null && activeNetInfo.isConnected()) {
-                BusProvider.getInstance().post(new ConnectionChangedEvent(true));
+                bus.post(new ConnectionChangedEvent(true));
             } else {
-                BusProvider.getInstance().post(new ConnectionChangedEvent(false));
+                bus.post(new ConnectionChangedEvent(false));
             }
-            BusProvider.getInstance().unregister(this);
+            bus.unregister(this);
         }
 
     }

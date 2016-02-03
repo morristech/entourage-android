@@ -34,7 +34,7 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import social.entourage.android.Constants;
 import social.entourage.android.DrawerActivity;
 import social.entourage.android.EntourageActivity;
-import social.entourage.android.EntourageComponent;
+import social.entourage.android.EntourageApplication;
 import social.entourage.android.R;
 import social.entourage.android.api.model.User;
 import social.entourage.android.view.HtmlTextView;
@@ -59,84 +59,47 @@ public class LoginActivity extends EntourageActivity implements LoginInformation
 
     LoginInformationFragment informationFragment;
 
-    @Inject
-    LoginPresenter loginPresenter;
+    @Inject LoginPresenter loginPresenter;
 
     /************************
      * Signup View
      ************************/
 
-    @Bind(R.id.login_include_signup)
-    View loginSignup;
-
-    @Bind(R.id.login_edit_phone)
-    EditText phoneEditText;
-
-    @Bind(R.id.login_edit_code)
-    EditText passwordEditText;
-
-    @Bind(R.id.login_button_signup)
-    Button loginButton;
-
-    @Bind(R.id.login_text_lost_code)
-    TextView lostCodeText;
+    @Bind(R.id.login_include_signup) View loginSignup;
+    @Bind(R.id.login_edit_phone) EditText phoneEditText;
+    @Bind(R.id.login_edit_code) EditText passwordEditText;
+    @Bind(R.id.login_button_signup) Button loginButton;
+    @Bind(R.id.login_text_lost_code) TextView lostCodeText;
 
     /************************
      * Lost Code View
      ************************/
 
-    @Bind(R.id.login_include_lost_code)
-    View loginLostCode;
-
-    @Bind(R.id.login_edit_phone_lost_code)
-    EditText lostCodePhone;
-
-    @Bind(R.id.login_button_ask_code)
-    Button receiveCodeButton;
-
-    @Bind(R.id.login_block_code_form)
-    View enterCodeBlock;
-
-    @Bind(R.id.login_block_lost_code_button)
-    View lostCodeButtonBlock;
-
-    @Bind(R.id.login_block_lost_code_confirmation)
-    View confirmationBlock;
-
-    @Bind(R.id.login_text_confirmation)
-    HtmlTextView codeConfirmation;
-
-    @Bind(R.id.login_button_home)
-    Button homeButton;
+    @Bind(R.id.login_include_lost_code) View loginLostCode;
+    @Bind(R.id.login_edit_phone_lost_code) EditText lostCodePhone;
+    @Bind(R.id.login_button_ask_code) Button receiveCodeButton;
+    @Bind(R.id.login_block_code_form) View enterCodeBlock;
+    @Bind(R.id.login_block_lost_code_button) View lostCodeButtonBlock;
+    @Bind(R.id.login_block_lost_code_confirmation) View confirmationBlock;
+    @Bind(R.id.login_text_confirmation) HtmlTextView codeConfirmation;
+    @Bind(R.id.login_button_home) Button homeButton;
 
     /************************
      * Welcome View
      ************************/
 
-    @Bind(R.id.login_include_welcome)
-    View loginWelcome;
-
-    @Bind(R.id.login_edit_email_profile)
-    EditText profileEmail;
-
-    @Bind(R.id.login_edit_name_profile)
-    EditText profileName;
-
-    @Bind(R.id.login_user_photo)
-    ImageView profilePhoto;
-
-    @Bind(R.id.login_button_go)
-    Button goButton;
+    @Bind(R.id.login_include_welcome) View loginWelcome;
+    @Bind(R.id.login_edit_email_profile) EditText profileEmail;
+    @Bind(R.id.login_edit_name_profile) EditText profileName;
+    @Bind(R.id.login_user_photo) ImageView profilePhoto;
+    @Bind(R.id.login_button_go) Button goButton;
 
     /************************
      * Tutorial View
      ************************/
 
-    @Bind(R.id.login_include_tutorial)
-    View loginTutorial;
-
-    @Bind(R.id.login_button_finish_tutorial)
-    Button finishTutorial;
+    @Bind(R.id.login_include_tutorial) View loginTutorial;
+    @Bind(R.id.login_button_finish_tutorial) Button finishTutorial;
 
     /************************
      * Startup View
@@ -152,10 +115,9 @@ public class LoginActivity extends EntourageActivity implements LoginInformation
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //checkPermissions();
-
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+        EntourageApplication.application().getActivityComponent().inject(this);
 
         FlurryAgent.logEvent(Constants.EVENT_LOGIN_START);
 
@@ -167,15 +129,6 @@ public class LoginActivity extends EntourageActivity implements LoginInformation
         Picasso.with(this).load(R.drawable.ic_user_photo)
                 .transform(new CropCircleTransformation())
                 .into(profilePhoto);
-    }
-
-    @Override
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerLoginComponent.builder()
-                .entourageComponent(entourageComponent)
-                .loginModule(new LoginModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

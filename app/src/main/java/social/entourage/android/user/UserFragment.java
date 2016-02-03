@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flurry.android.FlurryAgent;
+import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
@@ -28,10 +29,8 @@ import butterknife.OnClick;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import social.entourage.android.Constants;
 import social.entourage.android.EntourageApplication;
-import social.entourage.android.EntourageComponent;
 import social.entourage.android.R;
 import social.entourage.android.api.model.User;
-import social.entourage.android.tools.BusProvider;
 import social.entourage.android.api.tape.event.UserChoiceEvent;
 
 public class UserFragment extends Fragment {
@@ -48,50 +47,23 @@ public class UserFragment extends Fragment {
 
     private View toReturn;
 
-    @Inject
-    UserPresenter presenter;
+    @Inject UserPresenter presenter;
+    @Inject Bus bus;
 
-    @Bind(R.id.user_photo)
-    ImageView userPhoto;
-
-    @Bind(R.id.user_name)
-    TextView userName;
-
-    @Bind(R.id.user_email)
-    TextView userEmail;
-
-    @Bind(R.id.user_tours_count)
-    TextView userTourCount;
-
-    @Bind(R.id.user_encounters_count)
-    TextView userEncountersCount;
-
-    @Bind(R.id.user_tours_switch)
-    Switch userToursSwitch;
-
-    @Bind(R.id.organization_photo)
-    ImageView organizationPhoto;
-
-    @Bind(R.id.user_organization)
-    TextView userOrganization;
-
-    @Bind(R.id.user_edit_email)
-    EditText userEditEmail;
-
-    @Bind(R.id.user_edit_code)
-    EditText userEditCode;
-
-    @Bind(R.id.user_edit_confirmation)
-    EditText userEditConfirmation;
-
-    @Bind(R.id.user_button_confirm_changes)
-    Button buttonConfirmChanges;
-
-    @Bind(R.id.user_button_unsubscribe)
-    Button buttonUnsubscribe;
-
-    @Bind(R.id.user_terms_and_conditions)
-    TextView termsAndConditions;
+    @Bind(R.id.user_photo) ImageView userPhoto;
+    @Bind(R.id.user_name) TextView userName;
+    @Bind(R.id.user_email) TextView userEmail;
+    @Bind(R.id.user_tours_count) TextView userTourCount;
+    @Bind(R.id.user_encounters_count) TextView userEncountersCount;
+    @Bind(R.id.user_tours_switch) Switch userToursSwitch;
+    @Bind(R.id.organization_photo) ImageView organizationPhoto;
+    @Bind(R.id.user_organization) TextView userOrganization;
+    @Bind(R.id.user_edit_email) EditText userEditEmail;
+    @Bind(R.id.user_edit_code) EditText userEditCode;
+    @Bind(R.id.user_edit_confirmation) EditText userEditConfirmation;
+    @Bind(R.id.user_button_confirm_changes) Button buttonConfirmChanges;
+    @Bind(R.id.user_button_unsubscribe) Button buttonUnsubscribe;
+    @Bind(R.id.user_terms_and_conditions) TextView termsAndConditions;
 
     // ----------------------------------
     // LIFECYCLE
@@ -100,6 +72,7 @@ public class UserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        EntourageApplication.application().getComponent().inject(this);
         if (toReturn == null) {
             toReturn = inflater.inflate(R.layout.fragment_user, container, false);
         }
@@ -111,16 +84,7 @@ public class UserFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupComponent(EntourageApplication.get(getActivity()).getEntourageComponent());
         configureView();
-    }
-
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerUserComponent.builder()
-                .entourageComponent(entourageComponent)
-                .userModule(new UserModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override
@@ -199,10 +163,10 @@ public class UserFragment extends Fragment {
     void setUsersToursOnly() {
         if (userToursSwitch.isChecked()) {
             presenter.saveUserToursOnly(true);
-            BusProvider.getInstance().post(new UserChoiceEvent(true));
+            bus.post(new UserChoiceEvent(true));
         } else {
             presenter.saveUserToursOnly(false);
-            BusProvider.getInstance().post(new UserChoiceEvent(false));
+            bus.post(new UserChoiceEvent(false));
         }
     }
 

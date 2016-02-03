@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.io.IOException;
@@ -65,7 +66,6 @@ import butterknife.OnClick;
 import social.entourage.android.BackPressable;
 import social.entourage.android.Constants;
 import social.entourage.android.EntourageApplication;
-import social.entourage.android.EntourageComponent;
 import social.entourage.android.EntourageLocation;
 import social.entourage.android.R;
 import social.entourage.android.api.model.TourTransportMode;
@@ -80,7 +80,6 @@ import social.entourage.android.map.confirmation.ConfirmationActivity;
 import social.entourage.android.map.encounter.CreateEncounterActivity;
 import social.entourage.android.map.tour.TourListItemView;
 import social.entourage.android.map.tour.TourService;
-import social.entourage.android.tools.BusProvider;
 
 public class MapEntourageFragment extends Fragment implements BackPressable, TourService.TourServiceListener {
 
@@ -96,8 +95,8 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    MapPresenter presenter;
+    @Inject MapPresenter presenter;
+    @Inject Bus bus;
 
     private int userId;
     private boolean userHistory;
@@ -134,44 +133,19 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
 
     private float originalMapLayoutWeight;
 
-    @Bind(R.id.fragment_map_pin)
-    View mapPin;
-
-    @Bind(R.id.fragment_map_gps_text)
-    TextView gpsText;
-
-    @Bind(R.id.fragment_map_follow_button)
-    View centerButton;
-
-    @Bind(R.id.button_start_tour_launcher)
-    Button buttonStartLauncher;
-
-    @Bind(R.id.layout_map_launcher)
-    View mapLauncherLayout;
-
-    @Bind(R.id.launcher_tour_go)
-    Button buttonLaunchTour;
-
-    @Bind(R.id.launcher_tour_transport_mode)
-    RadioGroup radioGroupTransportMode;
-
-    @Bind(R.id.launcher_tour_type)
-    RadioGroup radioGroupType;
-
-    @Bind(R.id.layout_map_tour)
-    View layoutMapTour;
-
-    @Bind(R.id.scrollview_tours)
-    ScrollView scrollviewTours;
-
-    @Bind(R.id.layout_tours)
-    LinearLayout layoutTours;
-
-    @Bind(R.id.layout_map)
-    FrameLayout layoutMapMain;
-
-    @Bind(R.id.fragment_map_main_layout)
-    LinearLayout layoutMain;
+    @Bind(R.id.fragment_map_pin) View mapPin;
+    @Bind(R.id.fragment_map_gps_text) TextView gpsText;
+    @Bind(R.id.fragment_map_follow_button) View centerButton;
+    @Bind(R.id.button_start_tour_launcher) Button buttonStartLauncher;
+    @Bind(R.id.layout_map_launcher) View mapLauncherLayout;
+    @Bind(R.id.launcher_tour_go) Button buttonLaunchTour;
+    @Bind(R.id.launcher_tour_transport_mode) RadioGroup radioGroupTransportMode;
+    @Bind(R.id.launcher_tour_type) RadioGroup radioGroupType;
+    @Bind(R.id.layout_map_tour) View layoutMapTour;
+    @Bind(R.id.scrollview_tours) ScrollView scrollviewTours;
+    @Bind(R.id.layout_tours) LinearLayout layoutTours;
+    @Bind(R.id.layout_map) FrameLayout layoutMapMain;
+    @Bind(R.id.fragment_map_main_layout) LinearLayout layoutMain;
 
     // ----------------------------------
     // LIFECYCLE
@@ -180,6 +154,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EntourageApplication.application().getComponent().inject(this);
         initializeLocationService();
         if (!isBound) {
             doBindService();
@@ -193,7 +168,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
         retrievedHistory = new TreeMap<>();
 
         FlurryAgent.logEvent(Constants.EVENT_OPEN_TOURS_FROM_MENU);
-        BusProvider.getInstance().register(this);
+        bus.register(this);
     }
 
     @Override
@@ -210,16 +185,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupComponent(EntourageApplication.get(getActivity()).getEntourageComponent());
         initializeMap();
-    }
-
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerMapComponent.builder()
-                .entourageComponent(entourageComponent)
-                .mapModule(new MapModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override
@@ -258,7 +224,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
         if (getActivity() != null) {
             getActivity().setTitle(R.string.activity_tours_title);
             if (isMapLoaded) {
-                BusProvider.getInstance().post(new CheckIntentActionEvent());
+                bus.post(new CheckIntentActionEvent());
             }
         }
     }
@@ -691,7 +657,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
                 @Override
                 public void onMapLoaded() {
                     isMapLoaded = true;
-                    BusProvider.getInstance().post(new CheckIntentActionEvent());
+                    bus.post(new CheckIntentActionEvent());
                 }
             });
         }

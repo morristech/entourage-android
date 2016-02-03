@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,7 +15,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import social.entourage.android.DrawerActivity;
-import social.entourage.android.EntourageComponent;
+import social.entourage.android.EntourageApplication;
 import social.entourage.android.EntourageSecuredActivity;
 import social.entourage.android.R;
 import social.entourage.android.api.model.map.Tour;
@@ -36,23 +35,13 @@ public class ConfirmationActivity extends EntourageSecuredActivity {
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    ConfirmationPresenter presenter;
+    @Inject ConfirmationPresenter presenter;
 
-    @Bind(R.id.confirmation_encounters)
-    TextView encountersView;
-
-    @Bind(R.id.confirmation_distance)
-    TextView distanceView;
-
-    @Bind(R.id.confirmation_duration)
-    TextView durationView;
-
-    @Bind(R.id.confirmation_resume_button)
-    Button resumeButton;
-
-    @Bind(R.id.confirmation_end_button)
-    Button endButton;
+    @Bind(R.id.confirmation_encounters) TextView encountersView;
+    @Bind(R.id.confirmation_distance) TextView distanceView;
+    @Bind(R.id.confirmation_duration) TextView durationView;
+    @Bind(R.id.confirmation_resume_button) Button resumeButton;
+    @Bind(R.id.confirmation_end_button) Button endButton;
 
     private Tour tour;
 
@@ -63,6 +52,7 @@ public class ConfirmationActivity extends EntourageSecuredActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EntourageApplication.application().getActivityComponent().inject(this);
         setFinishOnTouchOutside(false);
 
         setContentView(R.layout.layout_map_confirmation);
@@ -74,15 +64,6 @@ public class ConfirmationActivity extends EntourageSecuredActivity {
 
         tour = (Tour) getIntent().getExtras().getSerializable(Tour.KEY_TOUR);
         initializeView();
-    }
-
-    @Override
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerConfirmationComponent.builder()
-                .entourageComponent(entourageComponent)
-                .confirmationModule(new ConfirmationModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

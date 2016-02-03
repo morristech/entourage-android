@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import social.entourage.android.EntourageComponent;
+import social.entourage.android.EntourageApplication;
 import social.entourage.android.EntourageSecuredActivity;
 import social.entourage.android.R;
 import social.entourage.android.api.model.Message;
@@ -21,24 +21,17 @@ import social.entourage.android.message.push.PushNotificationService;
 
 public class MessageActivity extends EntourageSecuredActivity {
 
-    @Inject
-    MessagePresenter presenter;
+    @Inject MessagePresenter presenter;
 
-    @Bind(R.id.message_author)
-    TextView messageAuthor;
-
-    @Bind(R.id.message_object)
-    TextView messageObject;
-
-    @Bind(R.id.message_content)
-    TextView messageContent;
-
-    @Bind(R.id.message_close_button)
-    Button closeButton;
+    @Bind(R.id.message_author) TextView messageAuthor;
+    @Bind(R.id.message_object) TextView messageObject;
+    @Bind(R.id.message_content) TextView messageContent;
+    @Bind(R.id.message_close_button) Button closeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EntourageApplication.application().getActivityComponent().inject(this);
 
         setContentView(R.layout.activity_message);
         ButterKnife.bind(this);
@@ -51,15 +44,6 @@ public class MessageActivity extends EntourageSecuredActivity {
         if (message != null) {
             displayMessage(message);
         }
-    }
-
-    @Override
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerMessageComponent.builder()
-                .entourageComponent(entourageComponent)
-                .messageModule(new MessageModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -17,11 +16,11 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import social.entourage.android.Constants;
 import social.entourage.android.EntourageActivity;
-import social.entourage.android.EntourageComponent;
+import social.entourage.android.EntourageApplication;
 import social.entourage.android.R;
 import social.entourage.android.api.model.map.Poi;
-import social.entourage.android.Constants;
 
 /**
  * Activity showing the detail of a POI
@@ -40,21 +39,14 @@ public class ReadPoiActivity extends EntourageActivity {
 
     private Poi poi;
 
-    @Inject
-    ReadPoiPresenter presenter;
+    @Inject ReadPoiPresenter presenter;
 
-    @Bind(R.id.textview_poi_name)
-    TextView txtPoiName;
-    @Bind(R.id.textview_poi_description)
-    TextView txtPoiDesc;
-    @Bind(R.id.button_poi_phone)
-    Button btnPoiPhone;
-    @Bind(R.id.button_poi_mail)
-    Button btnPoiMail;
-    @Bind(R.id.button_poi_web)
-    Button btnPoiWeb;
-    @Bind(R.id.button_poi_address)
-    Button btnPoiAddress;
+    @Bind(R.id.textview_poi_name) TextView txtPoiName;
+    @Bind(R.id.textview_poi_description) TextView txtPoiDesc;
+    @Bind(R.id.button_poi_phone) Button btnPoiPhone;
+    @Bind(R.id.button_poi_mail) Button btnPoiMail;
+    @Bind(R.id.button_poi_web) Button btnPoiWeb;
+    @Bind(R.id.button_poi_address) Button btnPoiAddress;
 
     // ----------------------------------
     // LIFECYCLE
@@ -63,6 +55,7 @@ public class ReadPoiActivity extends EntourageActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EntourageApplication.application().getActivityComponent().inject(this);
 
         setContentView(R.layout.activity_poi_read);
         ButterKnife.bind(this);
@@ -70,15 +63,6 @@ public class ReadPoiActivity extends EntourageActivity {
         FlurryAgent.logEvent(Constants.EVENT_OPEN_POI_FROM_MAP);
         Bundle extras = getIntent().getExtras();
         poi = (Poi) extras.get(BUNDLE_KEY_POI);
-    }
-
-    @Override
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerReadPoiComponent.builder()
-                .entourageComponent(entourageComponent)
-                .readPoiModule(new ReadPoiModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

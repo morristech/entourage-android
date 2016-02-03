@@ -26,7 +26,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import social.entourage.android.Constants;
 import social.entourage.android.EntourageApplication;
-import social.entourage.android.EntourageComponent;
 import social.entourage.android.R;
 
 public class LoginInformationFragment extends DialogFragment {
@@ -42,33 +41,21 @@ public class LoginInformationFragment extends DialogFragment {
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    LoginInformationPresenter presenter;
+    @Inject LoginInformationPresenter presenter;
 
-    @Bind(R.id.login_button_close_info)
-    ImageButton closeButton;
-
-    @Bind(R.id.login_button_facebook)
-    ImageButton facebookButton;
-
-    @Bind(R.id.login_button_twitter)
-    ImageButton twitterButton;
-
-    @Bind(R.id.login_edit_email_ask_more)
-    EditText emailEditText;
-
-    @Bind(R.id.login_button_newsletter)
-    Button newsletterButton;
+    @Bind(R.id.login_button_close_info) ImageButton closeButton;
+    @Bind(R.id.login_button_facebook) ImageButton facebookButton;
+    @Bind(R.id.login_button_twitter) ImageButton twitterButton;
+    @Bind(R.id.login_edit_email_ask_more) EditText emailEditText;
+    @Bind(R.id.login_button_newsletter) Button newsletterButton;
 
     // ----------------------------------
     // LIFECYCLE
     // ----------------------------------
 
-
-    public LoginInformationFragment() {}
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        EntourageApplication.application().getComponent().inject(this);
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         View toReturn = inflater.inflate(R.layout.fragment_login_information, container, false);
         ButterKnife.bind(this, toReturn);
@@ -78,15 +65,6 @@ public class LoginInformationFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupComponent(EntourageApplication.get(getActivity()).getEntourageComponent());
-    }
-
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerLoginInformationComponent.builder()
-                .entourageComponent(entourageComponent)
-                .loginInformationModule(new LoginInformationModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

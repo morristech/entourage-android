@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +26,6 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import social.entourage.android.Constants;
 import social.entourage.android.EntourageApplication;
-import social.entourage.android.EntourageComponent;
 import social.entourage.android.EntourageLocation;
 import social.entourage.android.R;
 import social.entourage.android.api.model.map.Category;
@@ -48,8 +45,7 @@ public class GuideMapEntourageFragment extends Fragment {
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    GuideMapPresenter presenter;
+    @Inject GuideMapPresenter presenter;
 
     private View toReturn;
 
@@ -66,6 +62,7 @@ public class GuideMapEntourageFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        EntourageApplication.application().getComponent().inject(this);
         if (toReturn == null) {
             toReturn = inflater.inflate(R.layout.fragment_guide_map, container, false);
         }
@@ -78,7 +75,6 @@ public class GuideMapEntourageFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupComponent(EntourageApplication.get(getActivity()).getEntourageComponent());
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.fragment_map);
         poisMap = new TreeMap<>();
         previousCameraLocation = EntourageLocation.cameraPositionToLocation(null, EntourageLocation.getInstance().getLastCameraPosition());
@@ -107,14 +103,6 @@ public class GuideMapEntourageFragment extends Fragment {
                 }
             });
         }
-    }
-
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerGuideMapComponent.builder()
-                .entourageComponent(entourageComponent)
-                .guideMapModule(new GuideMapModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

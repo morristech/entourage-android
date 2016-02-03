@@ -58,10 +58,8 @@ public class TourService extends Service {
 
     private final IBinder binder = new LocalBinder();
 
-    @Inject
-    TourRequest tourRequest;
-    @Inject
-    EncounterRequest encounterRequest;
+    @Inject TourRequest tourRequest;
+    @Inject EncounterRequest encounterRequest;
 
     private TourServiceManager tourServiceManager;
 
@@ -111,7 +109,7 @@ public class TourService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        EntourageApplication.get(this).getEntourageComponent().inject(this);
+        EntourageApplication.application().getComponent().inject(this);
 
         tourServiceManager = new TourServiceManager(this, tourRequest, encounterRequest);
 

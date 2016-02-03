@@ -23,7 +23,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import social.entourage.android.Constants;
-import social.entourage.android.EntourageComponent;
+import social.entourage.android.EntourageApplication;
 import social.entourage.android.EntourageSecuredActivity;
 import social.entourage.android.R;
 import social.entourage.android.api.model.map.Encounter;
@@ -45,14 +45,10 @@ public class CreateEncounterActivity extends EntourageSecuredActivity {
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    CreateEncounterPresenter presenter;
+    @Inject CreateEncounterPresenter presenter;
 
-    @Bind(R.id.edittext_message)
-    EditText messageEditText;
-
-    @Bind(R.id.edittext_street_person_name)
-    EditText streetPersonNameEditText;
+    @Bind(R.id.edittext_message) EditText messageEditText;
+    @Bind(R.id.edittext_street_person_name) EditText streetPersonNameEditText;
 
     // ----------------------------------
     // LIFECYCLE
@@ -61,6 +57,7 @@ public class CreateEncounterActivity extends EntourageSecuredActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EntourageApplication.application().getActivityComponent().inject(this);
 
         setContentView(R.layout.activity_encounter_create);
         ButterKnife.bind(this);
@@ -87,15 +84,6 @@ public class CreateEncounterActivity extends EntourageSecuredActivity {
     @Override
     protected void onResume() {
         super.onResume();
-    }
-
-    @Override
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerCreateEncounterComponent.builder()
-                .entourageComponent(entourageComponent)
-                .createEncounterModule(new CreateEncounterModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

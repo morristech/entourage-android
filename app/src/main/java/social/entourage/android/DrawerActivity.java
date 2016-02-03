@@ -19,13 +19,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
@@ -45,7 +45,6 @@ import social.entourage.android.map.confirmation.ConfirmationActivity;
 import social.entourage.android.map.tour.TourInformationFragment;
 import social.entourage.android.map.tour.TourService;
 import social.entourage.android.message.push.RegisterGCMService;
-import social.entourage.android.tools.BusProvider;
 import social.entourage.android.user.UserFragment;
 
 public class DrawerActivity extends EntourageSecuredActivity implements TourInformationFragment.OnTourInformationFragmentFinish, ChoiceFragment.OnChoiceFragmentFinish {
@@ -62,26 +61,15 @@ public class DrawerActivity extends EntourageSecuredActivity implements TourInfo
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    DrawerPresenter presenter;
+    @Inject DrawerPresenter presenter;
+    @Inject Bus bus;
 
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
-
-    @Bind(R.id.drawer_layout)
-    DrawerLayout drawerLayout;
-
-    @Bind(R.id.navigation_view)
-    NavigationView navigationView;
-
-    @Bind(R.id.content_view)
-    View contentView;
-
-    @Bind(R.id.drawer_header_user_name)
-    TextView userName;
-
-    @Bind(R.id.drawer_header_user_photo)
-    ImageView userPhoto;
+    @Bind(R.id.toolbar) Toolbar toolbar;
+    @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @Bind(R.id.navigation_view) NavigationView navigationView;
+    @Bind(R.id.content_view) View contentView;
+    @Bind(R.id.drawer_header_user_name) TextView userName;
+    @Bind(R.id.drawer_header_user_photo) ImageView userPhoto;
 
     private Fragment mainFragment;
     private MapEntourageFragment mapEntourageFragment;
@@ -100,6 +88,8 @@ public class DrawerActivity extends EntourageSecuredActivity implements TourInfo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
         ButterKnife.bind(this);
+        EntourageApplication.application().getActivityComponent().inject(this);
+
 
         configureToolbar();
         configureNavigationItem();
@@ -119,16 +109,6 @@ public class DrawerActivity extends EntourageSecuredActivity implements TourInfo
             userName.setText(user.getFullName());
         }
 
-        BusProvider.getInstance().register(this);
-    }
-
-    @Override
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerDrawerComponent.builder()
-                .entourageComponent(entourageComponent)
-                .drawerModule(new DrawerModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override
@@ -179,6 +159,12 @@ public class DrawerActivity extends EntourageSecuredActivity implements TourInfo
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        bus.register(this);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         highlightCurrentMenuItem();
@@ -193,6 +179,12 @@ public class DrawerActivity extends EntourageSecuredActivity implements TourInfo
                 sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
             }
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        bus.unregister(this);
     }
 
     // ----------------------------------

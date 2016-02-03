@@ -38,7 +38,6 @@ import social.entourage.android.api.model.map.TourPoint;
 import social.entourage.android.Constants;
 import social.entourage.android.map.encounter.CreateEncounterPresenter.EncounterUploadTask;
 import social.entourage.android.api.tape.EncounterTaskResult;
-import social.entourage.android.tools.BusProvider;
 
 import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 

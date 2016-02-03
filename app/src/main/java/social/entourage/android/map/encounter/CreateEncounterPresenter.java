@@ -12,7 +12,6 @@ import social.entourage.android.api.model.map.Encounter;
 import social.entourage.android.api.tape.EncounterTapeTaskQueue;
 import social.entourage.android.authentication.AuthenticationController;
 import social.entourage.android.api.tape.EncounterTaskResult;
-import social.entourage.android.tools.BusProvider;
 
 /**
  * Presenter controlling the CreateEncounterActivity

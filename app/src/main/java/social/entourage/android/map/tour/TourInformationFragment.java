@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -16,15 +15,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
@@ -33,7 +25,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import social.entourage.android.EntourageApplication;
-import social.entourage.android.EntourageComponent;
 import social.entourage.android.R;
 import social.entourage.android.api.model.TourTransportMode;
 import social.entourage.android.api.model.TourType;
@@ -45,35 +36,17 @@ public class TourInformationFragment extends DialogFragment {
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    TourInformationPresenter presenter;
+    @Inject TourInformationPresenter presenter;
 
-    @Bind(R.id.tour_info_icon)
-    ImageView tourIcon;
-
-    @Bind(R.id.tour_info_date)
-    TextView tourDate;
-
-    @Bind(R.id.tour_info_duration)
-    TextView tourDuration;
-
-    @Bind(R.id.tour_info_organization)
-    TextView tourOrganization;
-
-    @Bind(R.id.tour_info_transport)
-    TextView tourTransport;
-
-    @Bind(R.id.tour_info_type)
-    TextView tourType;
-
-    @Bind(R.id.tour_info_status_ongoing)
-    TextView tourStatusOnGoing;
-
-    @Bind(R.id.tour_info_status_closed)
-    TextView tourStatusClosed;
-
-    @Bind(R.id.tour_info_button_close)
-    Button closeButton;
+    @Bind(R.id.tour_info_icon) ImageView tourIcon;
+    @Bind(R.id.tour_info_date) TextView tourDate;
+    @Bind(R.id.tour_info_duration) TextView tourDuration;
+    @Bind(R.id.tour_info_organization) TextView tourOrganization;
+    @Bind(R.id.tour_info_transport) TextView tourTransport;
+    @Bind(R.id.tour_info_type) TextView tourType;
+    @Bind(R.id.tour_info_status_ongoing) TextView tourStatusOnGoing;
+    @Bind(R.id.tour_info_status_closed) TextView tourStatusClosed;
+    @Bind(R.id.tour_info_button_close) Button closeButton;
 
     Tour tour;
 
@@ -92,6 +65,7 @@ public class TourInformationFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        EntourageApplication.application().getComponent().inject(this);
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         super.onCreateView(inflater, container, savedInstanceState);
         View toReturn = inflater.inflate(R.layout.fragment_tour_information, container, false);
@@ -103,15 +77,6 @@ public class TourInformationFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupComponent(EntourageApplication.get(getActivity()).getEntourageComponent());
-    }
-
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerTourInformationComponent.builder()
-                .entourageComponent(entourageComponent)
-                .tourInformationModule(new TourInformationModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override

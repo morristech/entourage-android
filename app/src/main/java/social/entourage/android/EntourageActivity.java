@@ -19,7 +19,6 @@ public abstract class EntourageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupComponent(EntourageApplication.get(this).getEntourageComponent());
     }
 
     public void showProgressDialog(int resId) {
@@ -40,10 +39,6 @@ public abstract class EntourageActivity extends AppCompatActivity {
             progressDialog.dismiss();
             progressDialog = null;
         }
-    }
-
-    protected void setupComponent(EntourageComponent entourageComponent) {
-
     }
 
     protected void hideKeyboard() {

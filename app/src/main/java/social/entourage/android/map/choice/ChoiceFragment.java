@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import social.entourage.android.EntourageApplication;
-import social.entourage.android.EntourageComponent;
 import social.entourage.android.R;
 import social.entourage.android.api.model.map.Tour;
 
@@ -33,11 +32,9 @@ public class ChoiceFragment extends DialogFragment implements ChoiceAdapter.Recy
     // ATTRIBUTES
     // ----------------------------------
 
-    @Inject
-    ChoicePresenter presenter;
+    @Inject ChoicePresenter presenter;
 
-    @Bind(R.id.choice_recycler_view)
-    RecyclerView recyclerView;
+    @Bind(R.id.choice_recycler_view) RecyclerView recyclerView;
 
     private List<Tour> tours;
 
@@ -56,6 +53,7 @@ public class ChoiceFragment extends DialogFragment implements ChoiceAdapter.Recy
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        EntourageApplication.application().getComponent().inject(this);
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         View toReturn = inflater.inflate(R.layout.fragment_choice, container, false);
         ButterKnife.bind(this, toReturn);
@@ -70,15 +68,6 @@ public class ChoiceFragment extends DialogFragment implements ChoiceAdapter.Recy
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupComponent(EntourageApplication.get(getActivity()).getEntourageComponent());
-    }
-
-    protected void setupComponent(EntourageComponent entourageComponent) {
-        DaggerChoiceComponent.builder()
-                .entourageComponent(entourageComponent)
-                .choiceModule(new ChoiceModule(this))
-                .build()
-                .inject(this);
     }
 
     @Override
