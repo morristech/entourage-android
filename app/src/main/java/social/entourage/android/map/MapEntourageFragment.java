@@ -2194,7 +2194,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
 
         moveFABDown();
 
-//        ensureMapVisible();
+        ensureMapVisible();
 
         final int targetHeight = layoutMain.getMeasuredHeight();
         newsfeedAdapter.setMapHeight(targetHeight);
@@ -2204,7 +2204,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
                 newsfeedAdapter.setMapHeight(val);
-                //layoutMain.forceLayout();
+                newsfeedListView.getLayoutManager().requestLayout();
             }
 
         });
@@ -2232,7 +2232,7 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
                 newsfeedAdapter.setMapHeight(val);
-                //layoutMain.forceLayout();
+                newsfeedListView.getLayoutManager().requestLayout();
             }
 
         });
@@ -2254,18 +2254,6 @@ public class MapEntourageFragment extends Fragment implements BackPressable, Tou
     }
 
     public void ensureMapVisible() {
-        //TODO Show map card
-//        if (layoutMapMain == null || newsfeedListView == null) {
-//            return;
-//        }
-//        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) layoutMapMain.getLayoutParams();
-//        if (lp.topMargin < 0) {
-//            lp.topMargin = 0;
-//            layoutMapMain.setLayoutParams(lp);
-//
-//            layoutMain.forceLayout();
-//        }
-
         newsfeedListView.scrollToPosition(0);
     }
 
